@@ -9,7 +9,7 @@ root = tk.Tk()
 root.title("Calendrier des devoirs")
 
 # Vérifier et créer le fichier de configuration si ce n'est pas encore fait
-config_file_path = "config.json"
+config_file_path = "json-files/config.json"
 if not os.path.exists(config_file_path):
     with open(config_file_path, "w", encoding="utf-8") as config_file:
         json.dump({"dark_mode": False}, config_file)
@@ -24,12 +24,12 @@ semaines = list(range(36, 53)) + list(range(1, 23))
 # Charger la liste des matières et la planification depuis les fichiers JSON
 def charger_matieres():
     print("Json matières chargé")
-    with open("matieres.json", "r", encoding="utf-8") as json_file:
+    with open("json-files/matieres.json", "r", encoding="utf-8") as json_file:
         return json.load(json_file)
 
 def charger_devoirs():
     print("Json devoirs chargé")
-    with open("devoirs.json", "r", encoding="utf-8") as json_file:
+    with open("json-files/devoirs.json", "r", encoding="utf-8") as json_file:
         return json.load(json_file)
 
 # Charger les données
