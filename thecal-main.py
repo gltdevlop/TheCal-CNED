@@ -13,12 +13,16 @@ semaines = list(range(36, 53)) + list(range(1, 23))
 
 # Charger la liste des matières et la planification depuis les fichiers JSON
 def charger_matieres():
+    print("Json matières chargé")
     with open("matieres.json", "r", encoding="utf-8") as json_file:
         return json.load(json_file)
 
+
 def charger_devoirs():
+    print("Json devoirs chargé")
     with open("devoirs.json", "r", encoding="utf-8") as json_file:
         return json.load(json_file)
+
 
 # Charger les données
 matieres = charger_matieres()
