@@ -131,7 +131,11 @@ def afficher_informations():
     info_window = tk.Toplevel(root)
     info_window.title("Informations")
 
-    version_label = tk.Label(info_window, text="Version: 1.0.0")
+    with open(config_file_path, "r", encoding="utf-8") as config_file:
+        config = json.load(config_file)
+
+        # Ajouter les informations sur le logiciel
+    version_label = tk.Label(info_window, text="Version " + config.get("version"))
     version_label.pack(pady=10)
 
     developer_label = tk.Label(info_window, text="Développé par: gltdevlop")
@@ -148,6 +152,10 @@ def on_closing():
     elif messagebox.askyesno("Confirmation", "Êtes-vous sûr de vouloir quitter sans enregistrer ?"):
         root.destroy()
 
+
+def left():
+    quit()
+
 # Créer un canvas avec une barre de défilement
 canvas = tk.Canvas(root)
 scrollbar = ttk.Scrollbar(root, orient="horizontal", command=canvas.xview)
@@ -163,6 +171,7 @@ for j, semaine in enumerate(semaines):
     header_label.grid(row=0, column=j * 2 + 2, padx=2, pady=2, sticky="nsew")
 
     # Ajouter une ligne de séparation horizontale
+    tk.Frame(frame, height=2, bg="black").grid(row=1, columnspan=len(semaines) * 2 + 2, sticky="ew")
 
     # Ajouter une ligne verticale après chaque colonne
     if j < len(semaines) - 1:
@@ -216,6 +225,10 @@ file_menu.add_command(label="Enregistrer (Ctrl + S)", command=lambda: sauvegarde
 file_menu.add_command(label="Enregistrer sous (Ctrl + Maj + S)", command=enregistrer_sous)
 file_menu.add_command(label="Informations", command=afficher_informations)
 
+opt_menu = Menu(menu, tearoff=0)  # Retirer le menu flottant
+menu.add_cascade(label="Options", menu=opt_menu)
+opt_menu.add_command(label="Quitter", command=left)
+
 # Raccourcis clavier
 root.bind('<Control-o>', lambda event: charger())
 root.bind('<Control-s>', lambda event: sauvegarder(filepath=fichier_charge))
@@ -224,7 +237,6 @@ root.bind('<Control-Shift-S>', lambda event: enregistrer_sous())
 
 # Modifier la taille de la fenêtre pour s'adapter aux cases plus grandes
 root.geometry('1200x800')
-root.minsize(width=800, height=300)
 
 # Associer la fonction on_closing à la fermeture de la fenêtre
 root.protocol("WM_DELETE_WINDOW", on_closing)

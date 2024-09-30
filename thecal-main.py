@@ -148,8 +148,11 @@ def afficher_informations():
     info_window = tk.Toplevel(root)
     info_window.title("Informations")
 
-    # Ajouter les informations sur le logiciel
-    version_label = tk.Label(info_window, text="Version: 1.0.0")
+    with open(config_file_path, "r", encoding="utf-8") as config_file:
+        config = json.load(config_file)
+
+            # Ajouter les informations sur le logiciel
+    version_label = tk.Label(info_window, text="Version " + config.get("version"))
     version_label.pack(pady=10)
 
     developer_label = tk.Label(info_window, text="Développé par: gltdevlop")
@@ -210,6 +213,10 @@ for i, (matiere_code, matiere_nom) in enumerate(matieres.items()):
 def on_frame_configure(event):
     canvas.configure(scrollregion=canvas.bbox("all"))
 
+def left():
+    quit()
+
+
 frame.bind("<Configure>", on_frame_configure)
 
 # Ajouter le canvas et la barre de défilement à la fenêtre principale
@@ -227,6 +234,10 @@ file_menu.add_command(label="Charger (Ctrl + O)", command=charger)
 file_menu.add_command(label="Enregistrer (Ctrl + S)", command=lambda: sauvegarder(filepath=fichier_charge))
 file_menu.add_command(label="Enregistrer sous (Ctrl + Maj + S)", command=enregistrer_sous)
 file_menu.add_command(label="Informations", command=afficher_informations)
+
+opt_menu = Menu(menu, tearoff=0)  # Retirer le menu flottant
+menu.add_cascade(label="Options", menu=opt_menu)
+opt_menu.add_command(label="Quitter", command=left)
 
 # Raccourcis clavier
 root.bind('<Control-o>', lambda event: charger())
