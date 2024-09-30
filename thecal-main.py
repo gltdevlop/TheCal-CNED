@@ -134,7 +134,7 @@ def afficher_informations():
     with open(config_file_path, "r", encoding="utf-8") as config_file:
         config = json.load(config_file)
 
-        # Ajouter les informations sur le logiciel
+    # Ajouter les informations sur le logiciel
     version_label = tk.Label(info_window, text="Version " + config.get("version"))
     version_label.pack(pady=10)
 
@@ -144,6 +144,11 @@ def afficher_informations():
     close_button = tk.Button(info_window, text="Fermer", command=info_window.destroy)
     close_button.pack(pady=10)
 
+# Fonction pour modifier les matières (le contenu sera ajouté plus tard)
+def modifier_matieres():
+    # Ici, on ajoutera le contenu pour gérer la modification des matières
+    messagebox.showinfo("Modifier les matières", "Fonctionnalité à implémenter.")
+
 # Fonction appelée lors de la fermeture de l'application
 def on_closing():
     if messagebox.askyesnocancel("Confirmation", "Voulez-vous enregistrer vos modifications avant de quitter ?"):
@@ -151,10 +156,6 @@ def on_closing():
         root.destroy()
     elif messagebox.askyesno("Confirmation", "Êtes-vous sûr de vouloir quitter sans enregistrer ?"):
         root.destroy()
-
-
-def left():
-    quit()
 
 # Créer un canvas avec une barre de défilement
 canvas = tk.Canvas(root)
@@ -194,52 +195,48 @@ for i, (matiere_code, matiere_nom) in enumerate(matieres.items()):
         # Ajouter une description sous chaque case à cocher
         if matiere_code in devoirs and str(semaine) in devoirs[matiere_code]:
             description_devoir = devoirs[matiere_code][str(semaine)]
-            tk.Label(frame, text=description_devoir, font=("Arial", 10)).grid(row=i * 2 + 3, column=j * 2 + 2, padx=2, pady=2)
+            tk.Label(frame, text=description_devoir, font=("Arial", 10)).grid(row=i * 2 + 3, column=j * 2 + 2, padx=2, pady=2, sticky="nsew")
 
     checkbox_vars.append(row_vars)
 
-    # Ajouter une ligne de séparation horizontale après chaque matière
-
-# Ajouter une ligne verticale avant la première colonne
-tk.Frame(frame, width=2, bg="black").grid(row=0, column=1, rowspan=len(matieres) * 2 + 2, sticky="ns")
-
-# Configurer le canvas pour avoir une barre de défilement
-def on_frame_configure(event):
-    canvas.configure(scrollregion=canvas.bbox("all"))
-
-frame.bind("<Configure>", on_frame_configure)
-
-# Ajouter le canvas et la barre de défilement à la fenêtre principale
+# Mettre à jour la taille de la fenêtre et du canvas pour s'adapter au contenu
+frame.update_idletasks()
+canvas.config(scrollregion=canvas.bbox("all"))
 canvas.pack(side="top", fill="both", expand=True)
 scrollbar.pack(side="bottom", fill="x")
 
-# Créer un menu avec les options "Charger", "Sauvegarder", "Informations"
-menu = Menu(root)
-root.config(menu=menu)
+# Ajouter une barre de menus
+menu_bar = Menu(root)
 
 # Menu Fichier
-file_menu = Menu(menu, tearoff=0)
-menu.add_cascade(label="Fichier", menu=file_menu)
+file_menu = Menu(menu_bar, tearoff=0)
 file_menu.add_command(label="Charger (Ctrl + O)", command=charger)
-file_menu.add_command(label="Enregistrer (Ctrl + S)", command=lambda: sauvegarder(filepath=fichier_charge))
-file_menu.add_command(label="Enregistrer sous (Ctrl + Maj + S)", command=enregistrer_sous)
-file_menu.add_command(label="Informations", command=afficher_informations)
+file_menu.add_command(label="Sauvegarder (Ctrl + S)", command=lambda: sauvegarder(fichier_charge))
+file_menu.add_command(label="Enregistrer sous (Ctrl + Shift + S)", command=enregistrer_sous)
+file_menu.add_separator()
+file_menu.add_command(label="Quitter", command=on_closing)
+menu_bar.add_cascade(label="Fichier", menu=file_menu)
 
-opt_menu = Menu(menu, tearoff=0)  # Retirer le menu flottant
-menu.add_cascade(label="Options", menu=opt_menu)
-opt_menu.add_command(label="Quitter", command=left)
+# Menu Options
+opt_menu = Menu(menu_bar, tearoff=0)
+opt_menu.add_command(label="Modifier les matières", command=modifier_matieres)
+menu_bar.add_cascade(label="Options", menu=opt_menu)
 
-# Raccourcis clavier
-root.bind('<Control-o>', lambda event: charger())
-root.bind('<Control-s>', lambda event: sauvegarder(filepath=fichier_charge))
-root.bind('<Control-S>', lambda event: enregistrer_sous())
-root.bind('<Control-Shift-S>', lambda event: enregistrer_sous())
+# Menu Aide
+help_menu = Menu(menu_bar, tearoff=0)
+help_menu.add_command(label="À propos", command=afficher_informations)
+menu_bar.add_cascade(label="Aide", menu=help_menu)
 
-# Modifier la taille de la fenêtre pour s'adapter aux cases plus grandes
-root.geometry('1200x800')
+root.config(menu=menu_bar)
 
-# Associer la fonction on_closing à la fermeture de la fenêtre
+# Ajouter les raccourcis clavier
+root.bind("<Control-s>", lambda event: sauvegarder(fichier_charge))
+root.bind("<Control-S>", lambda event: sauvegarder(fichier_charge))  # Pour majuscule
+root.bind("<Control-Shift-s>", lambda event: enregistrer_sous())
+root.bind("<Control-o>", lambda event: charger())
+
+# Lier la fonction de fermeture de fenêtre personnalisée
 root.protocol("WM_DELETE_WINDOW", on_closing)
 
-# Démarrer la boucle principale de l'application
+# Lancer l'application
 root.mainloop()
