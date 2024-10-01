@@ -1,13 +1,12 @@
 {
     "1": "Français",
     "2": "Histoire-Géographie",
-    "3": "Enseignement scientifique",
     "4": "Mathématiques spécifiques",
-    "5": "Enseignement civique et moral",
-    "6": "Éducation aux médias et à l'information",
-    "7": "Langue Vivante A",
-    "8": "Langue Vivante B",
-    "9": "Histoire géo, géopolitique et sciences politiques",
-    "10": "Numérique et sciences informatiques",
-    "11": "Sciences économiques et sociales"
+    "6": "Enseignement civique et moral",
+    "7": "Éducation aux médias et à l'information",
+    "8": "Langue Vivante A",
+    "9": "Langue Vivante B",
+    "18": "Mathématiques",
+    "21": "Sciences de la Vie et de la Terre",
+    "22": "Sciences économiques et sociales"
 }

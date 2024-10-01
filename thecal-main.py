@@ -144,10 +144,169 @@ def afficher_informations():
     close_button = tk.Button(info_window, text="Fermer", command=info_window.destroy)
     close_button.pack(pady=10)
 
-# Fonction pour modifier les matières (le contenu sera ajouté plus tard)
+
+# Fonction pour sauvegarder les devoirs après modification
+def sauvegarder_devoirs(devoirs):
+    with open("json-files/devoirs.json", "w", encoding="utf-8") as f:
+        json.dump(devoirs, f, ensure_ascii=False, indent=4)
+    messagebox.showinfo("Succès", "Les devoirs ont été mis à jour.")
+
+
+# Fonction pour modifier les matières
+# Fonction pour modifier les matières avec une scrollbar verticale
 def modifier_matieres():
-    # Ici, on ajoutera le contenu pour gérer la modification des matières
-    messagebox.showinfo("Modifier les matières", "Fonctionnalité à implémenter.")
+    matiere_window = tk.Toplevel(root)
+    matiere_window.title("Modifier les matières")
+
+    # Frame pour le canvas et la scrollbar
+    frame_canvas = tk.Frame(matiere_window)
+    frame_canvas.pack(fill="both", expand=True)
+
+    # Canvas pour les matières
+    matiere_canvas = tk.Canvas(frame_canvas)
+    matiere_canvas.pack(side="left", fill="both", expand=True)
+
+    # Scrollbar verticale
+    scrollbar = ttk.Scrollbar(frame_canvas, orient="vertical", command=matiere_canvas.yview)
+    scrollbar.pack(side="right", fill="y")
+    matiere_canvas.configure(yscrollcommand=scrollbar.set)
+
+    # Frame pour les matières dans le canvas
+    matiere_frame = tk.Frame(matiere_canvas)
+    matiere_canvas.create_window((0, 0), window=matiere_frame, anchor="nw")
+
+    # Charger les matières prédéfinies et sélectionnées
+    with open("json-files/predefined_matieres.json", "r", encoding="utf-8") as f:
+        predefined_matieres = json.load(f)
+
+    with open("json-files/matieres.json", "r", encoding="utf-8") as f:
+        selected_matieres = json.load(f)
+
+    checkbox_vars = {}
+
+    # Fonction pour sauvegarder les matières modifiées
+    def sauvegarder_matieres():
+        nouvelles_matieres = {}
+        nouvelles_matieres_devoirs = {}
+
+        for matiere_id, var in checkbox_vars.items():
+            if var.get() == 1:
+                nouvelles_matieres[matiere_id] = predefined_matieres[matiere_id]
+                if matiere_id not in devoirs:
+                    nouvelles_matieres_devoirs[matiere_id] = {}
+            elif matiere_id in devoirs:
+                devoirs.pop(matiere_id)
+
+        with open("json-files/matieres.json", "w", encoding="utf-8") as f:
+            json.dump(nouvelles_matieres, f, ensure_ascii=False, indent=4)
+
+        devoirs.update(nouvelles_matieres_devoirs)
+        sauvegarder_devoirs(devoirs)
+        charger_matieres()
+        charger_devoirs()
+        messagebox.showinfo("Succès", "Les matières ont été mises à jour.")
+        matiere_window.destroy()
+
+    # Afficher les matières à cocher
+    for matiere_id, matiere_nom in predefined_matieres.items():
+        var = tk.IntVar()
+        if matiere_id in selected_matieres:
+            var.set(1)
+        checkbox = tk.Checkbutton(matiere_frame, text=matiere_nom, variable=var)
+        checkbox.pack(anchor='w')
+        checkbox_vars[matiere_id] = var
+
+    # Boutons Enregistrer et Annuler
+    save_button = tk.Button(matiere_window, text="Enregistrer", command=sauvegarder_matieres)
+    save_button.pack(pady=10)
+
+    close_button = tk.Button(matiere_window, text="Annuler", command=matiere_window.destroy)
+    close_button.pack(pady=5)
+
+    # Mise à jour de la scrollbar
+    matiere_frame.update_idletasks()
+    matiere_canvas.configure(scrollregion=matiere_canvas.bbox("all"))
+# Fonction pour modifier les devoirs avec des scrollbars verticale et horizontale
+def modifier_devoirs():
+    devoir_window = tk.Toplevel(root)
+    devoir_window.title("Modifier les devoirs")
+
+    # Frame pour le canvas et les scrollbars
+    frame_canvas = tk.Frame(devoir_window)
+    frame_canvas.pack(fill="both", expand=True)
+
+    # Canvas pour les devoirs
+    devoir_canvas = tk.Canvas(frame_canvas)
+    devoir_canvas.pack(side="left", fill="both", expand=True)
+
+    # Scrollbar verticale
+    v_scrollbar = ttk.Scrollbar(frame_canvas, orient="vertical", command=devoir_canvas.yview)
+    v_scrollbar.pack(side="right", fill="y")
+
+    # Scrollbar horizontale
+    h_scrollbar = ttk.Scrollbar(devoir_window, orient="horizontal", command=devoir_canvas.xview)
+    h_scrollbar.pack(side="bottom", fill="x")
+
+    devoir_canvas.configure(yscrollcommand=v_scrollbar.set, xscrollcommand=h_scrollbar.set)
+
+    # Frame pour les devoirs dans le canvas
+    devoir_frame = tk.Frame(devoir_canvas)
+    devoir_canvas.create_window((0, 0), window=devoir_frame, anchor="nw")
+
+    # Charger les matières et les devoirs
+    with open("json-files/matieres.json", "r", encoding="utf-8") as f:
+        selected_matieres = json.load(f)
+
+    with open("json-files/devoirs.json", "r", encoding="utf-8") as f:
+        devoirs = json.load(f)
+
+    devoir_vars = {}
+
+    # Fonction pour sauvegarder les devoirs modifiés
+    def sauvegarder_devoirs_modifies():
+        for matiere_id, semaine_vars in devoir_vars.items():
+            for semaine, var in semaine_vars.items():
+                if var.get() == 1:
+                    devoirs[matiere_id][semaine] = f"Devoir {len(devoirs[matiere_id]) + 1}"
+                elif semaine in devoirs[matiere_id]:
+                    devoirs[matiere_id].pop(semaine)
+
+        sauvegarder_devoirs(devoirs)
+        charger_matieres()
+        charger_devoirs()
+        devoir_window.destroy()
+
+    # Afficher les cases à cocher pour les semaines de chaque matière
+    for matiere_id, matiere_nom in selected_matieres.items():
+        label = tk.Label(devoir_frame, text=f"{matiere_nom} :")
+        label.pack(anchor='w')
+
+        semaine_vars = {}
+        week_frame = tk.Frame(devoir_frame)
+        week_frame.pack(anchor='w')
+
+        for semaine in semaines:
+            var = tk.IntVar()
+            if str(semaine) in devoirs.get(matiere_id, {}):
+                var.set(1)
+            checkbox = tk.Checkbutton(week_frame, text=f"S{semaine}", variable=var)
+            checkbox.pack(side='left')
+            semaine_vars[semaine] = var
+
+        devoir_vars[matiere_id] = semaine_vars
+
+    # Bouton pour sauvegarder
+    save_button = tk.Button(devoir_window, text="Enregistrer", command=sauvegarder_devoirs_modifies)
+    save_button.pack(pady=10)
+
+    # Bouton pour annuler
+    close_button = tk.Button(devoir_window, text="Annuler", command=devoir_window.destroy)
+    close_button.pack(pady=5)
+
+    # Mise à jour de la scrollbar
+    devoir_frame.update_idletasks()
+    devoir_canvas.configure(scrollregion=devoir_canvas.bbox("all"))
+    
 
 # Fonction appelée lors de la fermeture de l'application
 def on_closing():
@@ -220,6 +379,7 @@ menu_bar.add_cascade(label="Fichier", menu=file_menu)
 # Menu Options
 opt_menu = Menu(menu_bar, tearoff=0)
 opt_menu.add_command(label="Modifier les matières", command=modifier_matieres)
+opt_menu.add_command(label="Modifier les devoirs", command=modifier_devoirs)
 menu_bar.add_cascade(label="Options", menu=opt_menu)
 
 # Menu Aide
@@ -239,4 +399,5 @@ root.bind("<Control-o>", lambda event: charger())
 root.protocol("WM_DELETE_WINDOW", on_closing)
 
 # Lancer l'application
+root.geometry('1000x600')
 root.mainloop()
