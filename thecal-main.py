@@ -306,7 +306,7 @@ def modifier_devoirs():
     # Mise à jour de la scrollbar
     devoir_frame.update_idletasks()
     devoir_canvas.configure(scrollregion=devoir_canvas.bbox("all"))
-    
+
 
 # Fonction appelée lors de la fermeture de l'application
 def on_closing():
