@@ -149,7 +149,7 @@ def afficher_informations():
 def sauvegarder_devoirs(devoirs):
     with open("json-files/devoirs.json", "w", encoding="utf-8") as f:
         json.dump(devoirs, f, ensure_ascii=False, indent=4)
-    messagebox.showinfo("Succès", "Les devoirs ont été mis à jour.")
+    messagebox.showinfo("Succès", "Les devoirs ont été mis à jour (un redémarrge de l'app est requis afin que ça s'affiche).")
 
 
 # Fonction pour modifier les matières
@@ -204,7 +204,7 @@ def modifier_matieres():
         sauvegarder_devoirs(devoirs)
         charger_matieres()
         charger_devoirs()
-        messagebox.showinfo("Succès", "Les matières ont été mises à jour.")
+        messagebox.showinfo("Succès", "Les matières ont été mises à jour (un redémarrge de l'app est requis afin que ça s'affiche).")
         matiere_window.destroy()
 
     # Afficher les matières à cocher
